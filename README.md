@@ -6,4 +6,3 @@ This software helps users create, edit, and save budgets.
 
 DevOps Spring 2025
 
-LOREM IPSUM.........
