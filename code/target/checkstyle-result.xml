@@ -2,6 +2,12 @@
 <checkstyle version="9.3">
 <file name="C:\Users\nickr\Dev\DevOps\Budget-Software\code\src\main\java\edu\westga\comp4420\budget_software\Main.java">
 </file>
+<file name="C:\Users\nickr\Dev\DevOps\Budget-Software\code\src\main\java\edu\westga\comp4420\budget_software\model\Category.java">
+</file>
+<file name="C:\Users\nickr\Dev\DevOps\Budget-Software\code\src\main\java\edu\westga\comp4420\budget_software\model\Expense.java">
+</file>
+<file name="C:\Users\nickr\Dev\DevOps\Budget-Software\code\src\main\java\edu\westga\comp4420\budget_software\model\Expenses.java">
+</file>
 <file name="C:\Users\nickr\Dev\DevOps\Budget-Software\code\src\main\java\edu\westga\comp4420\budget_software\view\codebehind\MainWindow.java">
 </file>
 </checkstyle>
