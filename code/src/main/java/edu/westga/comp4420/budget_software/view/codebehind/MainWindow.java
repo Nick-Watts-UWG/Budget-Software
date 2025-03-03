@@ -17,6 +17,9 @@ public class MainWindow {
     private Button buttonAddExpense;
 
     @FXML
+    private Button buttonRemoveExpense;
+
+    @FXML
     private Button buttonPersonalInfo;
 
     @FXML
