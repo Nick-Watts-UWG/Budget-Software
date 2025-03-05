@@ -17,6 +17,9 @@ import javafx.scene.Scene;
 public class Main extends Application {
 	public static final String WINDOW_TITLE = "Budget Software | Nick Watts";
 	public static final String GUI_RESOURCE = "view/codebehind/MainWindow.fxml";
+	public static final String PERSONAL_INFO_RESOURCE = "view/codebehind/PersonalInfo.fxml";
+	public static final String WINDOW_TITLE_PERSONAL_INFO = "P E R S O N A L   I N F O";
+
 
 	/**
 	 * JavaFX entry point.

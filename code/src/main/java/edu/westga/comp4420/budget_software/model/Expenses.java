@@ -32,4 +32,12 @@ public class Expenses {
         }
         this.expenses.remove(expense);
     }
+
+    /**
+     * Gets the expeneses list property
+     * @return the list property of expenses.
+     */
+    public ListProperty<Expense> getExpenses() {
+        return this.expenses;
+    }
 }

@@ -1,6 +1,7 @@
 package edu.westga.comp4420.budget_software.model;
 
 public class Expense {
+    private static final String EXPENSE_TOSTRING_DIVIDER = "    |    ";
     private static final String ARGUMENT_NAME_CANNOT_BE_BLANK = "Argument: name cannot be blank";
     private static final String ARGUMENT_AMOUNT_CANNOT_BE_BLANK = "Argument: amount cannot be blank";
     private static final String ARGUMENT_CATEGORY_INVALID = "Argument: category invalid.";
@@ -60,5 +61,15 @@ public class Expense {
         } else if (!valid_enum) {
             throw new IllegalArgumentException(ARGUMENT_CATEGORY_INVALID);
         }
+    }
+
+    @Override
+    public String toString() {
+        String toString = "";
+        toString += this.name + EXPENSE_TOSTRING_DIVIDER;
+        toString += "$" + this.amount + EXPENSE_TOSTRING_DIVIDER;
+        toString += this.category;
+
+        return toString;
     }
 }
