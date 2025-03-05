@@ -25,7 +25,7 @@
       <Button fx:id="buttonAddExpense" layoutX="243.0" layoutY="447.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="117.0" text="Add Expense" />
       <Button fx:id="buttonPersonalInfo" layoutX="43.0" layoutY="447.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="117.0" text="Enter Personal Info" />
       <Button fx:id="buttonSaveBudget" layoutX="640.0" layoutY="447.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="117.0" text="Save Budget" />
-      <TextArea fx:id="textAreaStats" disable="true" layoutX="582.0" layoutY="54.0" prefHeight="374.0" prefWidth="210.0" wrapText="true" />
+      <TextArea fx:id="textAreaStats" layoutX="582.0" layoutY="54.0" prefHeight="374.0" prefWidth="210.0" wrapText="true" />
       <Button fx:id="buttonRemoveExpense" layoutX="443.0" layoutY="447.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="117.0" text="Remove Expense" />
    </children>
 </AnchorPane>

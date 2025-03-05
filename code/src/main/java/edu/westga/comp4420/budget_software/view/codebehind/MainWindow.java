@@ -50,11 +50,45 @@ public class MainWindow {
 	void initialize() {
         this.listviewExpenses.itemsProperty().bind(this.viewModel.getExpenses());
         this.bindPersonalInfoButton();
+        this.bindAddExpenseButton();
+        this.bindRemoveExpenseButton();
         this.textAreaStats.textProperty().bind(this.viewModel.getUserInfoSummary());
 	}
 
     public MainWindow() {
         this.viewModel = new MainWindowViewModel();
+    }
+
+    private void bindAddExpenseButton() {
+        this.buttonAddExpense.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(Main.class.getResource(Main.ADD_EXPENSE_RESOURCE));
+                loader.load();
+                Parent parent = loader.getRoot();
+                Scene scene = new Scene(parent);
+                Stage addExpenseStage = new Stage();
+                addExpenseStage.setTitle(Main.WINDOW_TITLE_ADD_EXPENSE);
+                addExpenseStage.setScene(scene);
+                addExpenseStage.initModality(Modality.WINDOW_MODAL);
+                AddExpenseWindow controller = (AddExpenseWindow) loader.getController();
+                addExpenseStage.showAndWait();
+                
+                Expense newExpense = controller.getCreatedExpense();
+                if (newExpense != null) {
+                    this.viewModel.addExpense(newExpense);
+                }
+            }  catch (FileNotFoundException exception) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setContentText("The FXML resource for the add expense screen was not found. Contact the developer");
+                alert.showAndWait();
+            } catch (IOException exception) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setContentText("Failed to load the add expense window. Contact the developer.");
+                alert.showAndWait();
+                System.out.println(exception.getMessage());
+            }
+        });
     }
 
     private void bindPersonalInfoButton() {
@@ -84,6 +118,18 @@ public class MainWindow {
                 alert.setContentText("Failed to load the personal info window. Contact the developer.");
                 alert.showAndWait();
                 System.out.println(exception.getMessage());
+            }
+        });
+    }
+
+    private void bindRemoveExpenseButton() {
+        this.buttonRemoveExpense.setOnAction(e -> {
+            if (this.listviewExpenses.getSelectionModel().getSelectedItem() == null) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setContentText("You need to select an expense to remove.");
+                alert.showAndWait();
+            } else {
+                this.viewModel.removeExpense(this.listviewExpenses.getSelectionModel().getSelectedItem());
             }
         });
     }
