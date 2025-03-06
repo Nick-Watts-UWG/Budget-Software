@@ -70,13 +70,25 @@ public class MainWindow {
 
     private void bindSaveBudgetButton() {
         this.buttonSaveBudget.setOnAction(e -> {
-            this.viewModel.saveBudget();
+            try {
+                this.viewModel.saveBudget();
+            } catch (Exception exception) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setContentText("Error saving file! Contact Develper.");
+                alert.showAndWait();
+            }
         });
     }
 
     private void bindLoadBudgetButton() {
         this.buttonLoadBudget.setOnAction(e -> {
-            this.viewModel.loadBudget();
+            try {
+                this.viewModel.loadBudget();
+            } catch (Exception exception) {
+                Alert alert = new Alert(AlertType.ERROR);
+                alert.setContentText("Error loading file! Contact Develper.");
+                alert.showAndWait();
+            }
         });
     }
 

@@ -9,9 +9,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-
 /**
  * The class that handles serialization and File IO for the
  * budget manager.
@@ -47,18 +44,14 @@ public class BudgetDataManager {
      * @param expenses the Expenses object containing the expenses list
      * @param userInfo the UserInfo object containing the monthly income
      */
-    public static void saveBudgetData(String filePath, Expenses expenses, UserInfo userInfo) {
+    public static void saveBudgetData(String filePath, Expenses expenses, UserInfo userInfo) throws IOException {
         List<Expense> expenseList = new ArrayList<>(expenses.getExpenses().get());
         float monthlyIncome = userInfo.getMonthlyIncome().get();
         
         BudgetData data = new BudgetData(expenseList, monthlyIncome);
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath))) {
-            out.writeObject(data);
-        } catch (IOException exception) {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setContentText(exception.getMessage());
-            alert.showAndWait();
-        }
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath));
+        out.writeObject(data);
+        
     }
 
     /**
@@ -68,20 +61,12 @@ public class BudgetDataManager {
      * @param expenses the Expenses object to be updated.
      * @param userInfo the UserInfo object to be updated.
      */
-    public static void loadBudgetData(String filePath, Expenses expenses, UserInfo userInfo) {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath))) {
-            BudgetData data = (BudgetData) in.readObject();
-            expenses.getExpenses().clear();
-            expenses.getExpenses().addAll(data.getExpenseList());
-            userInfo.setMonthlyIncome(data.getMonthlyIncome());
-        } catch (IOException exception) {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setContentText(exception.getMessage());
-            alert.showAndWait();
-        } catch (ClassNotFoundException exception) {
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setContentText(exception.getMessage() + "\n" + "The classes referenced could not be found. ");
-            alert.showAndWait();
-        }
+    public static void loadBudgetData(String filePath, Expenses expenses, UserInfo userInfo) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath));
+        BudgetData data = (BudgetData) in.readObject();
+        expenses.getExpenses().clear();
+        expenses.getExpenses().addAll(data.getExpenseList());
+        userInfo.setMonthlyIncome(data.getMonthlyIncome());
     }
+    
 }

@@ -4,6 +4,9 @@ import edu.westga.comp4420.budget_software.model.Expenses;
 import edu.westga.comp4420.budget_software.model.UserInfo;
 import edu.westga.comp4420.budget_software.model.BudgetStats;
 import edu.westga.comp4420.budget_software.model.Expense;
+
+import java.io.IOException;
+
 import edu.westga.comp4420.budget_software.model.BudgetDataManager;
 
 import javafx.beans.binding.StringBinding;
@@ -38,7 +41,7 @@ public class MainWindowViewModel {
      * Calling this saves the current expenses and monthly income
      * in a file called budget.dat.
      */
-    public void saveBudget() {
+    public void saveBudget() throws IOException {
         BudgetDataManager.saveBudgetData("budget.dat", this.expenses, this.userInfo);
     }
 
@@ -47,7 +50,7 @@ public class MainWindowViewModel {
      * "budget.dat" file if it exists. If it does not, the
      * user will be notified.
      */
-    public void loadBudget() {
+    public void loadBudget() throws IOException, ClassNotFoundException {
         BudgetDataManager.loadBudgetData("budget.dat", this.expenses, this.userInfo);
     }
 
