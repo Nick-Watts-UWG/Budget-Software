@@ -6,10 +6,20 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
+/**
+ * The class that holds all of the user's expenses.
+ * 
+ * @author Nick
+ * @version Spring 2025
+ */
 public class Expenses {
 
     private ListProperty<Expense> expenses;
 
+    /**
+     * The constructor for Expenses.
+     * Sets up the observable array list so the expenses can be bound.
+     */
     public Expenses() {
         this.expenses = new SimpleListProperty<Expense>(FXCollections.observableArrayList(new ArrayList<Expense>()));
     }
@@ -33,10 +43,7 @@ public class Expenses {
         this.expenses.remove(expense);
     }
 
-    /**
-     * Gets the expeneses list property
-     * @return the list property of expenses.
-     */
+
     public ListProperty<Expense> getExpenses() {
         return this.expenses;
     }

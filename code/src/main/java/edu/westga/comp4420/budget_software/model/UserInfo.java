@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 /**
- * Contains the person information of the user.
+ * Contains the personal information of the user.
  * @author Nick
  * @version Spring 2025
  */
@@ -15,7 +15,7 @@ public class UserInfo {
     private StringProperty userInfoSummary;
 
     /**
-     * Create the object that holds the user's personal info.
+     * Creates the object that holds the user's personal info.
      */
     public UserInfo() {
         this.monthlyIncome = new SimpleFloatProperty(0);
@@ -23,9 +23,7 @@ public class UserInfo {
         this.setUserInfoSummary();
     }
 
-    /** gets the monthly income
-     * @return the monthly income float property
-     */
+
     public FloatProperty getMonthlyIncome() {
         return this.monthlyIncome;
     }
@@ -34,9 +32,6 @@ public class UserInfo {
         return this.userInfoSummary;
     }
 
-    /** sets the monthly income and updates info summary.
-     * @param income the new income value
-     */
     public void setMonthlyIncome(float income) {
         this.monthlyIncome.setValue(income);
         this.setUserInfoSummary();

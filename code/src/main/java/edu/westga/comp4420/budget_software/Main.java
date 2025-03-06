@@ -11,7 +11,7 @@ import javafx.scene.Scene;
 /**
  * Entry point for the program
  *
- * @author	Comp 4420
+ * @author	Nick
  * @version Spring 2024
  */
 public class Main extends Application {

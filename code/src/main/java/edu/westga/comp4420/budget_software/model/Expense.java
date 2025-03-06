@@ -1,6 +1,16 @@
 package edu.westga.comp4420.budget_software.model;
 
-public class Expense {
+import java.io.Serializable;
+
+
+/**
+ * The class that holds expense information.
+ * 
+ * @author Nick
+ * @version Spring 2025
+ */
+public class Expense implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static final String EXPENSE_TOSTRING_DIVIDER = "    |    ";
     private static final String ARGUMENT_NAME_CANNOT_BE_BLANK = "Argument: name cannot be blank";
     private static final String ARGUMENT_AMOUNT_CANNOT_BE_BLANK = "Argument: amount cannot be blank";
@@ -63,6 +73,10 @@ public class Expense {
         }
     }
 
+    /**
+     * The over-ride of toString. This is used to display
+     * the expense's information in the listview in mainwindow.
+     */
     @Override
     public String toString() {
         String toString = "";

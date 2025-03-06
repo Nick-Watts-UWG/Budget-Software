@@ -22,7 +22,7 @@ import javafx.scene.control.Alert.AlertType;
 /**
  * CodeBehind To Handle Processing for the MainWindow
  *
- * @author	Comp 4420
+ * @author Nick
  * @version Spring 2024
  */
 public class MainWindow {   
@@ -39,6 +39,9 @@ public class MainWindow {
     private Button buttonSaveBudget;
 
     @FXML
+    private Button buttonLoadBudget;
+
+    @FXML
     private ListView<Expense> listviewExpenses;
 
     @FXML
@@ -53,10 +56,28 @@ public class MainWindow {
         this.bindAddExpenseButton();
         this.bindRemoveExpenseButton();
         this.textAreaStats.textProperty().bind(this.viewModel.getSummary());
+        this.bindSaveBudgetButton();
+        this.bindLoadBudgetButton();
 	}
 
+    /**
+     * The constructor for the main window.
+     * Sets the view model.
+     */
     public MainWindow() {
         this.viewModel = new MainWindowViewModel();
+    }
+
+    private void bindSaveBudgetButton() {
+        this.buttonSaveBudget.setOnAction(e -> {
+            this.viewModel.saveBudget();
+        });
+    }
+
+    private void bindLoadBudgetButton() {
+        this.buttonLoadBudget.setOnAction(e -> {
+            this.viewModel.loadBudget();
+        });
     }
 
     private void bindAddExpenseButton() {
@@ -104,6 +125,7 @@ public class MainWindow {
                 personalInfoStage.setScene(scene);
                 personalInfoStage.initModality(Modality.WINDOW_MODAL);
                 PersonalInfo controller = (PersonalInfo) loader.getController();
+                controller.setCurrentIncome(this.viewModel.getCurrentMonthlyIncome());
                 personalInfoStage.showAndWait();
                 
                 float income = controller.getMonthlyIncome();

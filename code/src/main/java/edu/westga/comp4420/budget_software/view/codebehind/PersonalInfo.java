@@ -30,6 +30,13 @@ public class PersonalInfo {
         this.setInputSanitation();
 	}
 
+    public void setCurrentIncome(float currentIncome) {
+        this.monthlyIncome = currentIncome;
+    }
+
+
+
+
     @FXML
     void actionSubmitPersonalInfo(ActionEvent event) {
         String incomeText = this.textFieldMonthlyIncome.getText().trim();
@@ -59,10 +66,6 @@ public class PersonalInfo {
         });
     }
 
-    /**
-     * Retrieves the entered monthly income.
-     * @return The monthly income as a float.
-     */
     public float getMonthlyIncome() {
         return this.monthlyIncome;
     }
