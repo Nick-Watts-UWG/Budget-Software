@@ -2,9 +2,10 @@ package edu.westga.comp4420.budget_software.view_model;
 
 import edu.westga.comp4420.budget_software.model.Expenses;
 import edu.westga.comp4420.budget_software.model.UserInfo;
+import edu.westga.comp4420.budget_software.model.BudgetStats;
 import edu.westga.comp4420.budget_software.model.Expense;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.StringProperty;
 
 
 /**
@@ -16,10 +17,23 @@ public class MainWindowViewModel {
 
     private Expenses expenses;
     private UserInfo userInfo;
+    private BudgetStats budgetStats;
     
     public MainWindowViewModel() {
         this.expenses = new Expenses();
         this.userInfo = new UserInfo();
+        this.budgetStats = new BudgetStats();
+
+        this.bindMonthlyIncomes();
+        this.bindExpenses();
+    }
+
+    private void bindMonthlyIncomes() {
+        this.budgetStats.bindMonthlyIncome(this.userInfo.getMonthlyIncome());
+    }
+
+    private void bindExpenses() {
+        this.budgetStats.bindExpenses(this.expenses.getExpenses());
     }
 
     public ListProperty<Expense> getExpenses() {
@@ -38,8 +52,8 @@ public class MainWindowViewModel {
         this.expenses.removeExpense(expense);
     }
 
-    public StringProperty getUserInfoSummary() {
-        return this.userInfo.getUserInfoProperty();
+    public StringBinding getSummary() {
+        return this.budgetStats.getSummary();
     }
 
 }

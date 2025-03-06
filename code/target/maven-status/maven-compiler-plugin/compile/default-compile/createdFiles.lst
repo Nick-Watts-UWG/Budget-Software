@@ -3,6 +3,6 @@ edu\westga\comp4420\budget_software\view_model\MainWindowViewModel.class
 edu\westga\comp4420\budget_software\view\codebehind\PersonalInfo.class
 edu\westga\comp4420\budget_software\view\codebehind\MainWindow.class
 edu\westga\comp4420\budget_software\model\Expenses.class
-edu\westga\comp4420\budget_software\model\Category.class
 edu\westga\comp4420\budget_software\model\UserInfo.class
 edu\westga\comp4420\budget_software\Main.class
+edu\westga\comp4420\budget_software\model\Category.class

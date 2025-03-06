@@ -72,4 +72,8 @@ public class Expense {
 
         return toString;
     }
+
+    public float getAmount() {
+        return this.amount;
+    }
 }

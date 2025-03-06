@@ -52,7 +52,7 @@ public class MainWindow {
         this.bindPersonalInfoButton();
         this.bindAddExpenseButton();
         this.bindRemoveExpenseButton();
-        this.textAreaStats.textProperty().bind(this.viewModel.getUserInfoSummary());
+        this.textAreaStats.textProperty().bind(this.viewModel.getSummary());
 	}
 
     public MainWindow() {
