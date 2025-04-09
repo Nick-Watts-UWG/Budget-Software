@@ -1,6 +1,6 @@
 # Budget Software
 
-This is the repo for my budget software.
+Driving meaningful budget outcomes through a paradigm shift in personal finance tooling.
 
 This software helps users create, edit, and save budgets.
 
