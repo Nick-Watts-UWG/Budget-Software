@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane minHeight="500.0" minWidth="487.0" prefHeight="566.0" prefWidth="648.0" style="-fx-background-color: snow;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.westga.comp4420.budget_software.view.codebehind.Graph">
+   <children>
+      <PieChart fx:id="pieBudget" layoutX="74.0" layoutY="93.0" title="Your Budget" />
+   </children>
+</AnchorPane>

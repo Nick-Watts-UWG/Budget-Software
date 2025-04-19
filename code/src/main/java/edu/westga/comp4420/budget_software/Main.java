@@ -19,8 +19,11 @@ public class Main extends Application {
 	public static final String GUI_RESOURCE = "view/codebehind/MainWindow.fxml";
 	public static final String PERSONAL_INFO_RESOURCE = "view/codebehind/PersonalInfo.fxml";
 	public static final String ADD_EXPENSE_RESOURCE = "view/codebehind/AddExpenseWindow.fxml";
+	public static final String GRAPH_RESOURCE = "view/codebehind/Graph.fxml";
 	public static final String WINDOW_TITLE_ADD_EXPENSE = "A D D   E X P E N S E";
 	public static final String WINDOW_TITLE_PERSONAL_INFO = "P E R S O N A L   I N F O";
+	public static final String WINDOW_TITLE_GRAPH = "V I S U A L I Z E";
+
 
 
 	/**

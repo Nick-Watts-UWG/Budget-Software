@@ -90,4 +90,8 @@ public class Expense implements Serializable {
     public float getAmount() {
         return this.amount;
     }
+
+    public Category getCategory() {
+        return this.category;
+    }
 }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import edu.westga.comp4420.budget_software.Main;
 import edu.westga.comp4420.budget_software.model.Expense;
 import edu.westga.comp4420.budget_software.view_model.MainWindowViewModel;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -28,6 +29,9 @@ import javafx.scene.control.Alert.AlertType;
 public class MainWindow {   
     @FXML
     private Button buttonAddExpense;
+
+    @FXML
+    private Button buttonGraph;
 
     @FXML
     private Button buttonRemoveExpense;
@@ -166,6 +170,35 @@ public class MainWindow {
                 this.viewModel.removeExpense(this.listviewExpenses.getSelectionModel().getSelectedItem());
             }
         });
+    }
+
+
+    
+    @FXML
+    void actionViewGraph(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(Main.class.getResource(Main.GRAPH_RESOURCE));
+            loader.load();
+            Parent parent = loader.getRoot();
+            Scene scene = new Scene(parent);
+            Stage graphStage = new Stage();
+            graphStage.setTitle(Main.WINDOW_TITLE_GRAPH);
+            graphStage.setScene(scene);
+            graphStage.initModality(Modality.NONE);
+            Graph controller = (Graph) loader.getController();
+            controller.setExpenses(this.viewModel.getExpenses());  
+            graphStage.showAndWait();
+        }  catch (FileNotFoundException exception) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setContentText("The FXML resource for the add expense screen was not found. Contact the developer");
+            alert.showAndWait();
+        } catch (IOException exception) {
+            Alert alert = new Alert(AlertType.ERROR);
+            alert.setContentText("Failed to load the add expense window. Contact the developer.");
+            alert.showAndWait();
+            System.out.println(exception.getMessage());
+        }
     }
 
 }
