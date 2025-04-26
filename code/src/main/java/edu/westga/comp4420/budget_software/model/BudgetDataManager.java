@@ -1,11 +1,14 @@
 package edu.westga.comp4420.budget_software.model;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import org.jasypt.encryption.pbe.StandardPBEByteEncryptor;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +48,21 @@ public class BudgetDataManager {
      * @param userInfo the UserInfo object containing the monthly income
      */
     public static void saveBudgetData(String filePath, Expenses expenses, UserInfo userInfo) throws IOException {
-        List<Expense> expenseList = new ArrayList<>(expenses.getExpenses().get());
-        float monthlyIncome = userInfo.getMonthlyIncome().get();
-        
-        BudgetData data = new BudgetData(expenseList, monthlyIncome);
-        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filePath));
-        out.writeObject(data);
-        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(new BudgetData(
+                new ArrayList<>(expenses.getExpenses().get()),
+                userInfo.getMonthlyIncome().get()
+            ));
+        }
+
+        byte[] plain = bos.toByteArray();
+
+        StandardPBEByteEncryptor encryptor = new StandardPBEByteEncryptor();
+        encryptor.setPassword("1337");
+        encryptor.setAlgorithm("PBEWithMD5AndDES");
+        byte[] cipher = encryptor.encrypt(plain);
+        Files.write(Paths.get(filePath), cipher);
     }
 
     /**
@@ -62,11 +73,20 @@ public class BudgetDataManager {
      * @param userInfo the UserInfo object to be updated.
      */
     public static void loadBudgetData(String filePath, Expenses expenses, UserInfo userInfo) throws IOException, ClassNotFoundException {
-        ObjectInputStream in = new ObjectInputStream(new FileInputStream(filePath));
-        BudgetData data = (BudgetData) in.readObject();
-        expenses.getExpenses().clear();
-        expenses.getExpenses().addAll(data.getExpenseList());
-        userInfo.setMonthlyIncome(data.getMonthlyIncome());
+        byte[] cipher = Files.readAllBytes(Paths.get(filePath));
+        StandardPBEByteEncryptor encryptor = new StandardPBEByteEncryptor();
+        encryptor.setPassword("1337");
+        encryptor.setAlgorithm("PBEWithMD5AndDES");
+
+        byte[] plain = encryptor.decrypt(cipher);
+
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(plain))) {
+            BudgetData data = (BudgetData) ois.readObject();
+            expenses.getExpenses().clear();
+            expenses.getExpenses().addAll(data.getExpenseList());
+            userInfo.setMonthlyIncome(data.getMonthlyIncome());
+        }
     }
     
 }
