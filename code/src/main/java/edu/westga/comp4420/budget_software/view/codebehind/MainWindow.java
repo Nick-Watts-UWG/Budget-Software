@@ -12,12 +12,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.paint.Color;
 
 
 /**
@@ -27,6 +29,10 @@ import javafx.scene.control.Alert.AlertType;
  * @version Spring 2024
  */
 public class MainWindow {   
+
+    @FXML
+    private Rectangle boxBudgetStatus;
+
     @FXML
     private Button buttonAddExpense;
 
@@ -88,6 +94,7 @@ public class MainWindow {
         this.buttonLoadBudget.setOnAction(e -> {
             try {
                 this.viewModel.loadBudget();
+                this.setBudgetStatusBoxColor();
             } catch (Exception exception) {
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setContentText("Error loading file! Contact Develper.");
@@ -114,6 +121,7 @@ public class MainWindow {
                 Expense newExpense = controller.getCreatedExpense();
                 if (newExpense != null) {
                     this.viewModel.addExpense(newExpense);
+                    this.setBudgetStatusBoxColor();
                 }
             }  catch (FileNotFoundException exception) {
                 Alert alert = new Alert(AlertType.ERROR);
@@ -145,7 +153,10 @@ public class MainWindow {
                 personalInfoStage.showAndWait();
                 
                 float income = controller.getMonthlyIncome();
+                float savingsGoal = controller.getMonthlySavingsGoal();
                 this.viewModel.setMonthlyIncome(income);
+                this.viewModel.setMonthlySavingsGoal(savingsGoal);
+                this.setBudgetStatusBoxColor();
 
             }  catch (FileNotFoundException exception) {
                 Alert alert = new Alert(AlertType.ERROR);
@@ -168,11 +179,23 @@ public class MainWindow {
                 alert.showAndWait();
             } else {
                 this.viewModel.removeExpense(this.listviewExpenses.getSelectionModel().getSelectedItem());
+                this.setBudgetStatusBoxColor();
             }
         });
     }
 
-
+    private void setBudgetStatusBoxColor() {
+        int color = this.viewModel.getBudgetStatus().getValue();
+        if (color == 3) {
+            this.boxBudgetStatus.setFill(Color.RED);
+        } else if (color == 2) {
+            this.boxBudgetStatus.setFill(Color.YELLOW);
+        } else if (color == 1) {
+            this.boxBudgetStatus.setFill(Color.GREEN);
+        } else {
+            this.boxBudgetStatus.setFill(Color.CYAN);
+        }
+    }
     
     @FXML
     void actionViewGraph(ActionEvent event) {

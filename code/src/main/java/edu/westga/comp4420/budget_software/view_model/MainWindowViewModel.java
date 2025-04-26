@@ -8,7 +8,7 @@ import edu.westga.comp4420.budget_software.model.Expense;
 import java.io.IOException;
 
 import edu.westga.comp4420.budget_software.model.BudgetDataManager;
-
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ListProperty;
 
@@ -56,6 +56,7 @@ public class MainWindowViewModel {
 
     private void bindMonthlyIncomes() {
         this.budgetStats.bindMonthlyIncome(this.userInfo.getMonthlyIncome());
+        this.budgetStats.bindMonthlyGoal(this.userInfo.getMonthlySavingsGoal());
     }
 
     private void bindExpenses() {
@@ -70,8 +71,16 @@ public class MainWindowViewModel {
         this.userInfo.setMonthlyIncome(income);
     }
 
+    public void setMonthlySavingsGoal(float goal) {
+        this.userInfo.setMonthlySavingsGoal(goal);
+    }
+
     public float getCurrentMonthlyIncome() {
         return this.userInfo.getMonthlyIncome().getValue();
+    }
+
+    public IntegerBinding getBudgetStatus() {
+        return this.budgetStats.getBudgetStatus();
     }
 
     /**

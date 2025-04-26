@@ -23,7 +23,11 @@ public class PersonalInfo {
     @FXML
     private TextField textFieldMonthlyIncome;
 
+    @FXML
+    private TextField textFieldSavingsGoal;
+
     private float monthlyIncome = 0.0f;
+    private float savingsGoal = 0.0f;
 
     @FXML
 	void initialize() {
@@ -34,15 +38,21 @@ public class PersonalInfo {
         this.monthlyIncome = currentIncome;
     }
 
+    public void setCurrentSavingsGoal(float savingsGoal) {
+        this.savingsGoal = savingsGoal;
+    }
+
 
 
 
     @FXML
     void actionSubmitPersonalInfo(ActionEvent event) {
         String incomeText = this.textFieldMonthlyIncome.getText().trim();
+        String goalText = this.textFieldSavingsGoal.getText().trim();
         
         try {
             this.monthlyIncome = Float.parseFloat(incomeText);
+            this.savingsGoal = Float.parseFloat(goalText);
         } catch (NumberFormatException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText("Invalid input. Please enter a numeric value.");
@@ -68,5 +78,9 @@ public class PersonalInfo {
 
     public float getMonthlyIncome() {
         return this.monthlyIncome;
+    }
+
+    public float getMonthlySavingsGoal() {
+        return this.savingsGoal;
     }
 }

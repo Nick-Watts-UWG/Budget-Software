@@ -11,8 +11,12 @@ import javafx.beans.property.StringProperty;
  * @version Spring 2025
  */
 public class UserInfo {
+
+    private static String spacing = "\n\n";
+
     private FloatProperty monthlyIncome;
     private StringProperty userInfoSummary;
+    private FloatProperty monthlySavingsGoal;
 
     /**
      * Creates the object that holds the user's personal info.
@@ -20,12 +24,22 @@ public class UserInfo {
     public UserInfo() {
         this.monthlyIncome = new SimpleFloatProperty(0);
         this.userInfoSummary = new SimpleStringProperty();
+        this.monthlySavingsGoal = new SimpleFloatProperty(0);
         this.setUserInfoSummary();
     }
 
 
     public FloatProperty getMonthlyIncome() {
         return this.monthlyIncome;
+    }
+
+    public FloatProperty getMonthlySavingsGoal() {
+        return this.monthlySavingsGoal;
+    }
+
+    public void setMonthlySavingsGoal(float goal) {
+        this.monthlySavingsGoal.setValue(goal);
+        this.setUserInfoSummary();
     }
 
     public StringProperty getUserInfoProperty() {
@@ -41,7 +55,8 @@ public class UserInfo {
     private void setUserInfoSummary() {
         String summary = "";
 
-        summary += "Monthly Income: " + this.monthlyIncome.getValue();
+        summary += "Monthly Income: " + this.monthlyIncome.getValue() + spacing;
+        summary += "Monthly Savings Goal: " + this.monthlySavingsGoal.getValue() + spacing;
         this.userInfoSummary.set(summary);
     }
 }
