@@ -3,104 +3,112 @@ package edu.westga.comp4420.budget_software.test.viewmodel;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.westga.comp4420.budget_software.view_model.MainWindowViewModel;
-import edu.westga.comp4420.budget_software.model.Expense;
 import edu.westga.comp4420.budget_software.model.Category;
+import edu.westga.comp4420.budget_software.model.Expense;
+import edu.westga.comp4420.budget_software.view_model.MainWindowViewModel;
 
 /**
- * JUnit tests for the MainWindowViewModel class.
- * @author Nick
- * @version Spring 2025
+ * Tests for main view model
  */
 class TestMainWindowViewModel {
 
-    private MainWindowViewModel viewModel;
-    private static final String BUDGET_FILE = "budget.dat";
-    
+    private MainWindowViewModel vm;
+    private static final File BUDGET_FILE = new File("budget.dat");
+
     @BeforeEach
     void setUp() {
-        viewModel = new MainWindowViewModel();
-        File file = new File(BUDGET_FILE);
-        if (file.exists()) {
-            file.delete();
-        }
+        this.vm = new MainWindowViewModel();
+        BUDGET_FILE.delete();
     }
-    
+
     @AfterEach
     void tearDown() {
-        File file = new File(BUDGET_FILE);
-        if (file.exists()) {
-            file.delete();
-        }
+        BUDGET_FILE.delete();
     }
-    
+
+
     @Test
-    void testInitialState() {
-        assertEquals(0.0f, viewModel.getCurrentMonthlyIncome(), "Initial monthly income should be 0.");
-        assertTrue(viewModel.getExpenses().isEmpty(), "Initial expenses list should be empty.");
-        
-        assertNotNull(viewModel.getSummary(), "Summary binding should not be null.");
-        assertNotNull(viewModel.getSummary().get(), "Summary string should not be null.");
+    void initialStateIsEmpty() {
+        assertEquals(0f, vm.getCurrentMonthlyIncome());
+        assertTrue(vm.getExpenses().isEmpty());
     }
-    
+
     @Test
-    void testSetMonthlyIncome() {
-        viewModel.setMonthlyIncome(2500.0f);
-        assertEquals(2500.0f, viewModel.getCurrentMonthlyIncome(), "Monthly income should be updated to 2500.");
+    void settingMonthlyIncomeUpdatesProperty() {
+        vm.setMonthlyIncome(2_500f);
+        assertEquals(2_500f, vm.getCurrentMonthlyIncome());
     }
-    
+
+
     @Test
-    void testAddAndRemoveExpense() {
-        Expense expense = new Expense("Test Expense", 100.0f, Category.FOOD);
-        viewModel.addExpense(expense);
-        assertEquals(1, viewModel.getExpenses().size(), "Expense list should have one expense after adding.");
-        
-        viewModel.removeExpense(expense);
-        assertTrue(viewModel.getExpenses().isEmpty(), "Expense list should be empty after removal");
+    void addAndRemoveExpenseUpdatesList() {
+        Expense exp = new Expense("Test", 100f, Category.FOOD);
+
+        vm.addExpense(exp);
+        assertEquals(1, vm.getExpenses().size());
+
+        vm.removeExpense(exp);
+        assertTrue(vm.getExpenses().isEmpty());
     }
-    
+
+
     @Test
-    void testSaveAndLoadBudget() {
-        viewModel.setMonthlyIncome(3000.0f);
-        Expense expense = new Expense("Rent", 1200.0f, Category.HOUSING);
-        viewModel.addExpense(expense);
-        
-        try {
-            viewModel.saveBudget();
-        } catch (IOException e) {
-            fail("Saving budget should not throw an exception: " + e.getMessage());
-        }
-        
-        viewModel.setMonthlyIncome(0.0f);
-        viewModel.removeExpense(expense);
-        assertEquals(0.0f, viewModel.getCurrentMonthlyIncome(), "Monthly income should be reset to 0.");
-        assertTrue(viewModel.getExpenses().isEmpty(), "Expense list should be empty after removal.");
-        
-        try {
-            viewModel.loadBudget();
-        } catch (IOException | ClassNotFoundException e) {
-            fail("Loading budget should not throw an exception: " + e.getMessage());
-        }
-        
-        assertEquals(3000.0f, viewModel.getCurrentMonthlyIncome(), "Monthly income should be restored to 3000.");
-        assertEquals(1, viewModel.getExpenses().size(), "Expense list should have one expense after loading.");
-        Expense loadedExpense = viewModel.getExpenses().get(0);
-        assertEquals(1200.0f, loadedExpense.getAmount(), "Expense amount should match.");
+    void saveAndLoadBudgetRestoresState() throws Exception {
+        vm.setMonthlyIncome(3_000f);
+        Expense rent = new Expense("Rent", 1_200f, Category.HOUSING);
+        vm.addExpense(rent);
+
+        vm.saveBudget();
+        assertTrue(BUDGET_FILE.exists());
+
+        vm.setMonthlyIncome(0f);
+        vm.removeExpense(rent);
+
+        vm.loadBudget();
+
+        assertAll(
+            () -> assertEquals(3_000f, vm.getCurrentMonthlyIncome()),
+            () -> assertEquals(1, vm.getExpenses().size())
+        );
     }
-    
+
     @Test
-    void testSummaryBindingUpdates() {
-        viewModel.setMonthlyIncome(4000.0f);
-        String summaryBefore = viewModel.getSummary().get();
-        
-        viewModel.setMonthlyIncome(5000.0f);
-        String summaryAfter = viewModel.getSummary().get();
-        assertNotEquals(summaryBefore, summaryAfter, "Summary should update when monthly income changes.");
+    void setMonthlySavingsGoalUpdatesSummary() {
+        String before = vm.getSummary().get();
+    
+        vm.setMonthlySavingsGoal(750f);
+    
+        String after = vm.getSummary().get();
+        assertNotEquals(before, after);
+        assertTrue(after.contains("Monthly Savings Goal: $750.0"));
+    }    
+
+
+    @Test
+    void summaryBindingUpdatesWhenIncomeChanges() {
+        String before = vm.getSummary().get();
+
+        vm.setMonthlyIncome(5_000f);
+
+        assertNotEquals(before, vm.getSummary().get());
+    }
+
+
+    @Test
+    void budgetStatusReflectsUnderlyingStats() {
+        vm.setMonthlyIncome(1_000f);
+        vm.addExpense(new Expense("Overspend", 950f, Category.MISC));
+        assertEquals(3, vm.getBudgetStatus().get());
+
+        vm.addExpense(new Expense("Bonus", -300f, Category.MISC));
+        assertEquals(2, vm.getBudgetStatus().get());
+
+        vm.setMonthlyIncome(5_000f);
+        assertEquals(1, vm.getBudgetStatus().get());
     }
 }

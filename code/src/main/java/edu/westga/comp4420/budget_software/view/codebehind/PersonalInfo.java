@@ -74,6 +74,15 @@ public class PersonalInfo {
                 }
             }
         });
+        this.textFieldSavingsGoal.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, 
+                String newValue) {
+                    if (!newValue.matches("\\d*(\\.\\d*)?")) {
+                        PersonalInfo.this.textFieldSavingsGoal.setText(oldValue);
+                }
+            }
+        });
     }
 
     public float getMonthlyIncome() {

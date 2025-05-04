@@ -2,95 +2,91 @@ package edu.westga.comp4420.budget_software.test.model.BudgetData;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import edu.westga.comp4420.budget_software.model.BudgetDataManager;
-import edu.westga.comp4420.budget_software.model.Expenses;
-import edu.westga.comp4420.budget_software.model.Expense;
-import edu.westga.comp4420.budget_software.model.UserInfo;
 import edu.westga.comp4420.budget_software.model.Category;
+import edu.westga.comp4420.budget_software.model.Expense;
+import edu.westga.comp4420.budget_software.model.Expenses;
+import edu.westga.comp4420.budget_software.model.UserInfo;
 
 /**
- * JUnit tests for the BudgetDataManager class.
- * @author Nick
- * @version Spring 2025
+ * Tests for budget data manager
  */
 class TestBudgetDataManager {
 
-    private static final String TEST_FILE_PATH = "test_budget_data.dat";
-    private Expenses expenses;
-    private UserInfo userInfo;
 
-    @BeforeEach
-    void setUp() {
-        this.expenses = new Expenses();
-        this.userInfo = new UserInfo();
+    @Test
+    void saveAndLoadRoundTrip(@TempDir Path dir) throws Exception {
+        Path file = dir.resolve("budget.dat");
+
+        Expenses expenses = new Expenses();
+        UserInfo info     = new UserInfo();
+        expenses.addExpense(new Expense("Groceries", 100f, Category.FOOD));
+        expenses.addExpense(new Expense("Rent", 1_200f, Category.HOUSING));
+        info.setMonthlyIncome(3_000f);
+
+        BudgetDataManager.saveBudgetData(file.toString(), expenses, info);
+
+        expenses.getExpenses().clear();
+        info.setMonthlyIncome(0f);
+
+        BudgetDataManager.loadBudgetData(file.toString(), expenses, info);
+
+        assertAll(
+            () -> assertEquals(2, expenses.getExpenses().size()),
+            () -> assertEquals(3_000f, info.getMonthlyIncome().get()),
+            () -> assertEquals(List.of("Groceries", "Rent"),
+                               expenses.getExpenses().stream()
+                                       .map(Expense::toString)
+                                       .map(s -> s.split("\\|")[0].trim())
+                                       .toList())
+        );
     }
 
-    @AfterEach
-    void tearDown() {
-        File file = new File(TEST_FILE_PATH);
-        if (file.exists()) {
-            file.delete();
-        }
+    @Test
+    void saveAndLoadHandlesZeroIncomeAndNoExpenses(@TempDir Path dir) throws Exception {
+        Path file = dir.resolve("budget.dat");
+
+        Expenses expenses = new Expenses();
+        UserInfo  info    = new UserInfo();
+        info.setMonthlyIncome(0f);
+
+        BudgetDataManager.saveBudgetData(file.toString(), expenses, info);
+
+        info.setMonthlyIncome(9_999f);
+        BudgetDataManager.loadBudgetData(file.toString(), expenses, info);
+
+        assertAll(
+            () -> assertTrue(expenses.getExpenses().isEmpty()),
+            () -> assertEquals(0f, info.getMonthlyIncome().get())
+        );
     }
 
 
     @Test
-    void testSaveAndLoadBudgetDataWithMultipleExpenses() {
-        Expense expense1 = new Expense("Groceries", 100.0f, Category.FOOD);
-        Expense expense2 = new Expense("Rent", 1200.0f, Category.HOUSING);
-        this.expenses.addExpense(expense1);
-        this.expenses.addExpense(expense2);
-        this.userInfo.setMonthlyIncome(3000.0f);
+    void persistedFileIsEncrypted(@TempDir Path dir) throws Exception {
+        Path file = dir.resolve("cipher.dat");
 
-        assertDoesNotThrow(() -> BudgetDataManager.saveBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
-        this.expenses.getExpenses().clear();
-        this.userInfo.setMonthlyIncome(0);
-        assertDoesNotThrow(() -> BudgetDataManager.loadBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
+        Expenses expenses = new Expenses();
+        UserInfo info     = new UserInfo();
+        expenses.addExpense(new Expense("SecretName", 42f, Category.MISC));
+        info.setMonthlyIncome(1_234f);
 
-        assertEquals(2, this.expenses.getExpenses().size());
-        assertEquals(3000.0f, this.userInfo.getMonthlyIncome().get());
-        assertTrue(this.expenses.getExpenses().get(0).getAmount() == expense1.getAmount());
-        assertTrue(this.expenses.getExpenses().get(1).getAmount() == expense2.getAmount());
+        BudgetDataManager.saveBudgetData(file.toString(), expenses, info);
+
+        String raw = Files.readString(file, StandardCharsets.ISO_8859_1);
+
+        assertAll(
+            () -> assertFalse(raw.contains("SecretName")),
+            () -> assertFalse(raw.contains("1234")),
+            () -> assertTrue(Files.size(file) > 0)
+        );
     }
-
-    @Test
-    void testSaveAndLoadBudgetDataWithNoExpenses() {
-        this.userInfo.setMonthlyIncome(4500.0f);
-
-        assertDoesNotThrow(() -> BudgetDataManager.saveBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
-        this.userInfo.setMonthlyIncome(0);
-        assertDoesNotThrow(() -> BudgetDataManager.loadBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
-
-        assertEquals(0, this.expenses.getExpenses().size());
-        assertEquals(4500.0f, this.userInfo.getMonthlyIncome().get());
-    }
-
-    @Test
-    void testSaveAndLoadBudgetDataWithZeroIncome() {
-        this.expenses.addExpense(new Expense("Phone Bill", 50.0f, Category.UTILITIES));
-        this.userInfo.setMonthlyIncome(0.0f);
-
-        assertDoesNotThrow(() -> BudgetDataManager.saveBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
-        this.expenses.getExpenses().clear();
-        assertDoesNotThrow(() -> BudgetDataManager.loadBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
-
-        assertEquals(1, this.expenses.getExpenses().size());
-        assertEquals(0.0f, this.userInfo.getMonthlyIncome().get());
-    }
-
-    @Test
-    void testSaveBudgetDataDoesNotThrowException() {
-        this.userInfo.setMonthlyIncome(1000.0f);
-        this.expenses.addExpense(new Expense("Water Bill", 40.0f, Category.UTILITIES));
-
-        assertDoesNotThrow(() -> BudgetDataManager.saveBudgetData(TEST_FILE_PATH, this.expenses, this.userInfo));
-    }
-
-    
 }

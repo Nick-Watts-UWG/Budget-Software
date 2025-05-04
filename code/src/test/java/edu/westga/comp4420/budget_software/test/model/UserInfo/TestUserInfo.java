@@ -6,13 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.westga.comp4420.budget_software.model.UserInfo;
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.StringProperty;
 
 /**
- * JUnit tests for the UserInfo class.
- * @author Nick
- * @version Spring 2025
+ * Tests for user info
  */
 class TestUserInfo {
 
@@ -23,52 +19,45 @@ class TestUserInfo {
         this.userInfo = new UserInfo();
     }
 
-
     @Test
-    void testConstructorInitializesWithDefaultValues() {
-        assertNotNull(this.userInfo.getMonthlyIncome());
-        assertNotNull(this.userInfo.getUserInfoProperty());
-        assertEquals(0.0f, this.userInfo.getMonthlyIncome().get());
-        assertEquals("Monthly Income: 0.0", this.userInfo.getUserInfoProperty().get());
-    }
+    void constructorInitialisesPropertiesAndSummary() {
+        assertEquals(0f, this.userInfo.getMonthlyIncome().get());
+        assertEquals(0f, this.userInfo.getMonthlySavingsGoal().get());
 
-
-    @Test
-    void testGetMonthlyIncomeReturnsCorrectFloatProperty() {
-        FloatProperty monthlyIncome = this.userInfo.getMonthlyIncome();
-        assertNotNull(monthlyIncome);
-        assertEquals(0.0f, monthlyIncome.get());
+        String summary = this.userInfo.getUserInfoProperty().get();
+        assertAll(
+            () -> assertTrue(summary.contains("Monthly Income: 0.0")),
+            () -> assertTrue(summary.contains("Monthly Savings Goal: 0.0"))
+        );
     }
 
     @Test
-    void testGetUserInfoPropertyReturnsCorrectStringProperty() {
-        StringProperty userInfoSummary = this.userInfo.getUserInfoProperty();
-        assertNotNull(userInfoSummary);
-        assertEquals("Monthly Income: 0.0", userInfoSummary.get());
-    }
+    void setMonthlyIncomeUpdatesPropertyAndSummary() {
+        this.userInfo.setMonthlyIncome(4_250.75f);
 
-
-    @Test
-    void testSetMonthlyIncomeUpdatesIncomeCorrectly() {
-        this.userInfo.setMonthlyIncome(5000.0f);
-        assertEquals(5000.0f, this.userInfo.getMonthlyIncome().get());
+        assertEquals(4_250.75f, this.userInfo.getMonthlyIncome().get());
+        assertTrue(this.userInfo.getUserInfoProperty().get()
+                   .contains("Monthly Income: 4250.75"));
     }
 
     @Test
-    void testSetMonthlyIncomeUpdatesUserInfoSummary() {
-        this.userInfo.setMonthlyIncome(3200.5f);
-        assertEquals("Monthly Income: 3200.5", this.userInfo.getUserInfoProperty().get());
+    void setMonthlySavingsGoalUpdatesPropertyAndSummary() {
+        this.userInfo.setMonthlySavingsGoal(800f);
+
+        assertEquals(800f, this.userInfo.getMonthlySavingsGoal().get());
+        assertTrue(this.userInfo.getUserInfoProperty().get()
+                   .contains("Monthly Savings Goal: 800.0"));
     }
 
     @Test
-    void testSetMonthlyIncomeWithZeroUpdatesCorrectly() {
-        this.userInfo.setMonthlyIncome(0.0f);
-        assertEquals("Monthly Income: 0.0", this.userInfo.getUserInfoProperty().get());
-    }
+    void combinedIncomeAndGoalAppearInSummary() {
+        this.userInfo.setMonthlyIncome(3_000f);
+        this.userInfo.setMonthlySavingsGoal(600f);
 
-    @Test
-    void testSetMonthlyIncomeWithNegativeValueUpdatesCorrectly() {
-        this.userInfo.setMonthlyIncome(-100.0f);
-        assertEquals("Monthly Income: -100.0", this.userInfo.getUserInfoProperty().get());
+        String summary = this.userInfo.getUserInfoProperty().get();
+        assertAll(
+            () -> assertTrue(summary.contains("Monthly Income: 3000.0")),
+            () -> assertTrue(summary.contains("Monthly Savings Goal: 600.0"))
+        );
     }
 }

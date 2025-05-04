@@ -114,6 +114,8 @@ public class MainWindow {
                 Stage addExpenseStage = new Stage();
                 addExpenseStage.setTitle(Main.WINDOW_TITLE_ADD_EXPENSE);
                 addExpenseStage.setScene(scene);
+                Stage primaryStage = (Stage) this.buttonAddExpense.getScene().getWindow();
+                addExpenseStage.initOwner(primaryStage);
                 addExpenseStage.initModality(Modality.WINDOW_MODAL);
                 AddExpenseWindow controller = (AddExpenseWindow) loader.getController();
                 addExpenseStage.showAndWait();
@@ -147,11 +149,12 @@ public class MainWindow {
                 Stage personalInfoStage = new Stage();
                 personalInfoStage.setTitle(Main.WINDOW_TITLE_PERSONAL_INFO);
                 personalInfoStage.setScene(scene);
+                Stage primaryStage = (Stage) this.buttonAddExpense.getScene().getWindow();
+                personalInfoStage.initOwner(primaryStage);
                 personalInfoStage.initModality(Modality.WINDOW_MODAL);
                 PersonalInfo controller = (PersonalInfo) loader.getController();
                 controller.setCurrentIncome(this.viewModel.getCurrentMonthlyIncome());
                 personalInfoStage.showAndWait();
-                
                 float income = controller.getMonthlyIncome();
                 float savingsGoal = controller.getMonthlySavingsGoal();
                 this.viewModel.setMonthlyIncome(income);

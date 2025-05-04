@@ -2,12 +2,15 @@ package edu.westga.comp4420.budget_software.test.model.BudgetStats;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import edu.westga.comp4420.budget_software.model.BudgetStats;
-import edu.westga.comp4420.budget_software.model.Expense;
 import edu.westga.comp4420.budget_software.model.Category;
+import edu.westga.comp4420.budget_software.model.Expense;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleFloatProperty;
@@ -15,131 +18,100 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
 /**
- * JUnit tests for the BudgetStats class.
- * @author Nick
- * @version Spring 2025
+ * Tests for budget stats
  */
 class TestBudgetStats {
 
     private BudgetStats stats;
+    private FloatProperty income;
+    private ListProperty<Expense> expenses;
 
     @BeforeEach
     void setUp() {
-        this.stats = new BudgetStats();
+        this.stats    = new BudgetStats();
+        this.income   = new SimpleFloatProperty();
+        this.expenses = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+        this.stats.bindMonthlyIncome(this.income);
+        this.stats.bindExpenses(this.expenses);
     }
 
 
     @Test
-    void testConstructorInitialValues() {
+    void constructorSummaryShowsZeroes() {
+        String summary = this.stats.getSummary().get();
+        assertAll(
+            () -> assertTrue(summary.contains("Monthly Income: $0.0")),
+            () -> assertTrue(summary.contains("Total Monthly Expenses: $0.0")),
+            () -> assertTrue(summary.contains("Discretionary Income: $0.0"))
+        );
+    }
+
+
+    @Test
+    void monthlyIncomeBindingReflectsExternalChanges() {
+        income.set(2_000f);
+        assertTrue(this.stats.getSummary().get().contains("Monthly Income: $2000.0"));
+    }
+
+
+    @Test
+    void addingExpensesUpdatesTotalsAndDiscretionaryIncome() {
+        income.set(1_000f);
+        expenses.add(new Expense("Car", 300f, Category.TRANSPORTATION));
+        expenses.add(new Expense("Ins", 100f, Category.TRANSPORTATION));
 
         String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Monthly Income: $0.0"));
-        assertTrue(summary.contains("Total Monthly Expenses: $0.0"));
-        assertTrue(summary.contains("Discretionary Income: $0.0"));
+        assertAll(
+            () -> assertTrue(summary.contains("Total Monthly Expenses: $400.0")),
+            () -> assertTrue(summary.contains("Discretionary Income: $600.0"))
+        );
+    }
+
+    @Test
+    void discretionaryIncomeCanGoNegative() {
+        income.set(500f);
+        expenses.add(new Expense("Overspend", 600f, Category.MISC));
+
+        assertTrue(this.stats.getSummary().get().contains("Discretionary Income: $-100.0"));
     }
 
 
     @Test
-    void testBindMonthlyIncomeReflectsChange() {
-        FloatProperty externalIncome = new SimpleFloatProperty(0.0f);
-        this.stats.bindMonthlyIncome(externalIncome);
+    void budgetStatusAcrossThresholds() {
+        income.set(2_000f);
+        assertEquals(1, this.stats.getBudgetStatus().get());
 
-        assertTrue(this.stats.getSummary().get().contains("Monthly Income: $0.0"));
+        expenses.add(new Expense("Rent", 1_700f, Category.HOUSING));
+        assertEquals(2, this.stats.getBudgetStatus().get());
 
-        externalIncome.set(2000.0f);
-        String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Monthly Income: $2000.0"));
+        expenses.add(new Expense("Food", 200f, Category.FOOD));
+        assertEquals(3, this.stats.getBudgetStatus().get());
     }
 
 
     @Test
-    void testBindExpensesWithNoExpenses() {
-        ListProperty<Expense> externalExpenses = new SimpleListProperty<>(FXCollections.observableArrayList());
-        this.stats.bindExpenses(externalExpenses);
+    void daysTillMillionaireCalculatedCorrectly() {
+        income.set(3_000f);
+        expenses.add(new Expense("Necessities", 1_000f, Category.MISC));
 
-        String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Total Monthly Expenses: $0.0"));
-    }
-
-    @Test
-    void testBindExpensesWithOneExpense() {
-        ListProperty<Expense> externalExpenses = new SimpleListProperty<>(FXCollections.observableArrayList());
-        this.stats.bindExpenses(externalExpenses);
-
-        externalExpenses.add(new Expense("Groceries", 150.0f, Category.FOOD));
-        String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Total Monthly Expenses: $150.0"));
-    }
+        double expected = 1_000_000d / (2_000d / 30.4d);
+        int actual = extractDays(this.stats.getSummary().get());
+        assertEquals((int) expected, actual, 1);    }
 
     @Test
-    void testBindExpensesWithMultipleExpenses() {
-        ListProperty<Expense> externalExpenses = new SimpleListProperty<>(FXCollections.observableArrayList());
-        this.stats.bindExpenses(externalExpenses);
+    void millionaireTimerIsZeroWhenNoDiscretionaryIncome() {
+        income.set(1_000f);
+        expenses.add(new Expense("All", 1_000f, Category.MISC));
 
-        externalExpenses.add(new Expense("Rent", 1200.0f, Category.HOUSING));
-        externalExpenses.add(new Expense("Utilities", 200.0f, Category.UTILITIES));
-        externalExpenses.add(new Expense("Gym Membership", 50.0f, Category.HEALTHCARE));
-
-        String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Total Monthly Expenses: $1450.0"));
+        assertEquals(0, extractDays(this.stats.getSummary().get()));
     }
 
 
-    @Test
-    void testDiscretionaryIncomeCalculation() {
-        FloatProperty externalIncome = new SimpleFloatProperty(1000.0f);
-        ListProperty<Expense> externalExpenses = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-        this.stats.bindMonthlyIncome(externalIncome);
-        this.stats.bindExpenses(externalExpenses);
-
-        externalExpenses.add(new Expense("Car Payment", 300.0f, Category.TRANSPORTATION));
-        externalExpenses.add(new Expense("Insurance", 100.0f, Category.TRANSPORTATION));
-
-        String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Monthly Income: $1000.0"));
-        assertTrue(summary.contains("Total Monthly Expenses: $400.0"));
-        assertTrue(summary.contains("Discretionary Income: $600.0"));
-
-        externalIncome.set(2000.0f);
-        summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Monthly Income: $2000.0"));
-        assertTrue(summary.contains("Discretionary Income: $1600.0"));
-    }
-
-    @Test
-    void testDiscretionaryIncomeGoesNegative() {
-        FloatProperty externalIncome = new SimpleFloatProperty(500.0f);
-        ListProperty<Expense> externalExpenses = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-        this.stats.bindMonthlyIncome(externalIncome);
-        this.stats.bindExpenses(externalExpenses);
-
-        externalExpenses.add(new Expense("Fancy Restaurant", 600.0f, Category.FOOD));
-
-        String summary = this.stats.getSummary().get();
-        assertTrue(summary.contains("Monthly Income: $500.0"));
-        assertTrue(summary.contains("Total Monthly Expenses: $600.0"));
-        assertTrue(summary.contains("Discretionary Income: $-100.0"));
-    }
-
-
-    @Test
-    void testSummaryUpdatesAutomatically() {
-        FloatProperty externalIncome = new SimpleFloatProperty(0.0f);
-        ListProperty<Expense> externalExpenses = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-        this.stats.bindMonthlyIncome(externalIncome);
-        this.stats.bindExpenses(externalExpenses);
-
-        assertTrue(this.stats.getSummary().get().contains("Monthly Income: $0.0"));
-
-        externalIncome.set(1200.0f);
-        assertTrue(this.stats.getSummary().get().contains("Monthly Income: $1200.0"));
-
-        externalExpenses.add(new Expense("Internet", 60.0f, Category.UTILITIES));
-        assertTrue(this.stats.getSummary().get().contains("Total Monthly Expenses: $60.0"));
-
-        assertTrue(this.stats.getSummary().get().contains("Discretionary Income: $1140.0"));
+    private static int extractDays(String summary) {
+        Pattern p = Pattern.compile("millionaire on this budget: (\\d+)");
+        Matcher m = p.matcher(summary);
+        assertTrue(m.find(), "Day count not found in summary");
+        return Integer.parseInt(m.group(1));
     }
 }
