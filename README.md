@@ -10,6 +10,8 @@ DevOps Spring 2025
 
 # Website Deployment Process
 
+## Using Vercel's NextJS hosting:
+
 1.) run "npm run build" to ensure there are no build errors.
 
 2.) Push your production build to github.
