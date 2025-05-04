@@ -20,3 +20,11 @@ DevOps Spring 2025
 
 4.) Click on your website repo, and click "deploy".
 
+# Running the Setup Script
+
+1.) The setup script must be in the project's parent directory and the website's folder must be in the parent directory.
+  (/parent/Budget-Software) && (/parent/Budget-Site)
+
+2.) In the terminal run "./setup.sh"
+
+3.) Watch it run
