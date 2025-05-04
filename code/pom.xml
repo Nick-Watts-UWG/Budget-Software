@@ -79,7 +79,7 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<version>0.0.6</version>
 				<configuration>
-					<mainClass>edu.westga.comp4420.budget_software.Main</mainClass>
+					<mainClass>edu.westga.comp4420.budget_software.Launcher</mainClass>
 				</configuration>
 			</plugin>
 			
@@ -154,6 +154,72 @@
 					
 				</executions>
 			</plugin>
+
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>  
+						<configuration>
+						<transformers>
+						<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+							<mainClass>edu.westga.comp4420.budget_software.Launcher</mainClass>
+						</transformer>
+						</transformers>
+					</configuration>
+                    </execution>
+                </executions>
+            </plugin>
+						      <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-gui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>target/Project.exe</outfile>
+                            <jar>target/${project.artifactId}-${project.version}.jar</jar>
+                            <dontWrapJar>false</dontWrapJar>
+                            <errTitle>Error in launch4j plugin</errTitle>
+                            <classPath>
+                                <mainClass>edu.westga.comp4420.budget_software.Launcher</mainClass>
+                            </classPath>
+                            <!--icon>Project.ico</icon-->
+                            <jre>
+								<path>%JAVA_HOME%</path>
+                                <minVersion>1.5.0</minVersion>
+                                <!--maxVersion>1.6.0</maxVersion-->
+                                <initialHeapSize>512</initialHeapSize>
+                                <maxHeapSize>1024</maxHeapSize>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0.0.0</txtFileVersion>
+                                <fileDescription>Simple project.</fileDescription>
+                                <copyright>Copyright (c) 2025 </copyright>
+                                <companyName>UWG Devops</companyName>
+                                <productVersion>3.0.0.0</productVersion>
+                                <txtProductVersion>${project.version}</txtProductVersion>
+                                <productName>Project</productName>
+                                <internalName>Project</internalName>
+                                <originalFilename>Project.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
 		</plugins>
 	</build>
 </project>
