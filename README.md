@@ -9,8 +9,12 @@ DevOps Spring 2025
 
 
 # Website Deployment Process
+
 1.) run "npm run build" to ensure there are no build errors.
+
 2.) Push your production build to github.
+
 3.) Link your vercel account with github.
+
 4.) Click on your website repo, and click "deploy".
 
